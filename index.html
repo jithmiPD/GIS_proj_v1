@@ -1,0 +1,84 @@
+<html>
+  <head>
+    <style>
+      .esri-elevation-profile.esri-component.esri-widget--panel {
+        width: 250px !important;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://js.arcgis.com/4.20/esri/themes/light/main.css"
+    />
+    <script src="https://js.arcgis.com/4.20/"></script>
+    <style>
+      html,
+      body,
+      #viewDiv {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <script>
+      // step1: First, we call all functions required in this script:
+      require([
+        "esri/Map",
+        "esri/WebScene",
+        "esri/views/SceneView",
+        "esri/widgets/ElevationProfile",
+        "esri/layers/FeatureLayer",
+        "esri/widgets/BasemapToggle",
+        "esri/widgets/LayerList",
+      ], function (
+        Map,
+        WebScene,
+        SceneView,
+        ElevationProfile,
+        FeatureLayer,
+        BasemapToggle,
+        LayerList
+      ) {
+        // step2_updated: Existing AGOL WebScene included:
+        const MyScene = new WebScene({
+          portalItem: { id: "4676c16c6ae34f3fa6e018e5e293ddea" },
+        });
+        const view = new SceneView({
+          container: "viewDiv",
+          map: MyScene,
+          camera: {
+            position: {
+              spatialReference: { latestWkid: 3857, wkid: 102100 },
+              x: 15428826,
+              y: -4152500,
+              z: 400,
+            },
+            heading: 180,
+            tilt: 66,
+          },
+        });
+        // step3: basemap toggle:
+        const toggle = new BasemapToggle({ view: view, nextBasemap: "hybrid" });
+        view.ui.add(toggle, "bottom-left");
+        // step4: add an AGOL feature layer:
+        const trees = new FeatureLayer({
+          url: "https://services5.arcgis.com/Lmcs3aS4AodOs221/arcgis/rest/services/Scene/FeatureServer",
+        });
+        MyScene.add(trees);
+        // step5: Layer list
+        let layerList = new LayerList({ view: view });
+        view.ui.add(layerList, { position: "top-right" });
+        // step6: Elevation Profile widget
+        const elevationProfile = new ElevationProfile({
+          view: view, //visible: true,
+          profiles: [{ type: "ground" }, { type: "view" }],
+          visibleElements: { selectButton: false },
+        });
+        view.ui.add(elevationProfile, "bottom-right");
+      });
+    </script>
+  </head>
+  <body>
+    <div id="viewDiv"></div>
+  </body>
+</html>
